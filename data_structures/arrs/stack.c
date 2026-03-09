@@ -32,13 +32,15 @@ int pop(Stack *stack)
 {
     if(is_empty(stack))
         return -1;
-    int top = --stack->top;
-    return stack->stack[++top];
+    int tmp = stack->stack[stack->top];
+    stack->top--;
+    printf("top %d\n", tmp);
+    return tmp;
 }
 
 int top(Stack *stack)
 {
-    return stack->top;
+    return stack->stack[stack->top];
 }
 
 void s_free(Stack* stack)
