@@ -10,7 +10,7 @@ typedef struct Stack {
 
 int is_full(Stack *stack)
 {
-    return (stack->top == stack->size);
+    return stack->top >= stack->size;
 }
 
 int is_empty(Stack *stack)
@@ -18,39 +18,53 @@ int is_empty(Stack *stack)
     return (stack->top == 0);
 }
 
-void s_push(Stack *stack, int val)
+int s_push(Stack *stack, int val)
 {
-    if(!is_full(stack))
-    {
-        int top = stack->top;
-        stack->data[top] = val;
-        ++stack->top;// = val;
-    }
+    if(!stack)
+        return 1;
+    if(is_full(stack))
+        return 1;
+
+    stack->data[stack->top++] = val;
+    return 0;
 }
 
-int s_pop(Stack *stack)
+int s_pop(Stack *stack, int *out)
 {
+    if(!stack || !out)
+        return 1;
     if(is_empty(stack))
         return -1;
     stack->top--;
-    return stack->data[stack->top];
+    *out = stack->data[stack->top];
+    return 0;
 }
 
-int s_top(Stack *stack)
+int s_top(Stack *stack, int *out)
 {
-    return stack->data[stack->top-1];
+    if(!stack || !out)
+        return 1;
+    if(is_empty(stack))
+        return -1;
+    *out = stack->data[stack->top-1];
+    return 0;
 }
 
-void s_free(Stack* stack)
+int s_free(Stack* stack)
 {
+    if(!stack)
+        return 1;
     free(stack->data);
     stack->data = NULL;
     stack->size = 0;
     stack->top = 0;
+    return 0;
 }
 
 int s_create(Stack *s, size_t size)
 {
+    if (!stack || size == 0)
+        return 1;
     s->data = malloc(sizeof(int) * size);
     if (!s->data) {
         printf("Error allocating memory for stack");
@@ -58,29 +72,36 @@ int s_create(Stack *s, size_t size)
     }
     s->size = size;
     s->top = 0;
+    return 0;
 }
 
-void s_print(Stack* stack)
+int s_print(Stack* stack)
 {
+    if (!stack)
+        return 1;
     printf("[ ");
-    for (int i = 0; i < stack->top; i++)
+    for (size_t i = 0; i < stack->top; i++)
         printf("%d ", stack->data[i]);
     printf("]\n");
 }
 
 int main()
 {
+    int out = 0;
     Stack my_s;
     s_create(&my_s, 10);
 
-    printf("Pop from empty: %d\n", s_pop(&my_s));
+    s_pop(&my_s, &out);
+    printf("Pop from empty: %d\n", out); 
     s_push(&my_s, 1);
     s_push(&my_s, 2);
     s_print(&my_s);
-    printf("Item pop: %d\n", s_pop(&my_s));
+    s_pop(&my_s, &out);
+    printf("Item pop: %d\n", out);
     s_print(&my_s);
     
-    printf("Item top: %d\n", s_top(&my_s));
+    s_top(&my_s, &out);
+    printf("Item top: %d\n", out);
     
     s_free(&my_s);
     printf("Stack after free: ");
